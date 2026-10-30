@@ -1,0 +1,170 @@
+<mxfile host="app.diagrams.net" modified="2026-10-28T09:00:00.000Z" agent="Mozilla/5.0" version="21.6.8" type="device">
+  <diagram id="kubeflow-data-cleaning" name="Kubeflow 数据清洗与现有系统接入全景架构">
+    <mxGraphModel dx="1420" dy="850" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="950" background="#f8fafc" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- 标题 -->
+        <mxCell id="title" value="Kubeflow 数据清洗流水线与现有系统深度集成全景架构" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#1e293b;" vertex="1" parent="1">
+          <mxGeometry x="380" y="20" width="640" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- 泳道 1: 数据输入源 (上游数据源) -->
+        <mxCell id="lane_sources" value="现有数据源 (Data Sources)" style="swimlane;whiteSpace=wrap;html=1;startSize=30;rounded=1;arcSize=8;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#0f172a;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="220" height="780" as="geometry" />
+        </mxCell>
+        <mxCell id="src_prom" value="&lt;b&gt;Prometheus&lt;/b&gt;&lt;br&gt;时序监控指标&lt;br&gt;(CPU/Memory/Disk)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#ef4444;fontColor=#991b1b;fontSize=11;" vertex="1" parent="lane_sources">
+          <mxGeometry x="25" y="60" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="src_loki" value="&lt;b&gt;Loki 日志中心&lt;/b&gt;&lt;br&gt;Pod应用/内核日志&lt;br&gt;(Syslog/Stderr/Stdout)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#f59e0b;fontColor=#92400e;fontSize=11;" vertex="1" parent="lane_sources">
+          <mxGeometry x="25" y="160" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="src_pg" value="&lt;b&gt;PostgreSQL&lt;/b&gt;&lt;br&gt;关系型业务与元数据&lt;br&gt;(kagent/audit/sessions)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0e7ff;strokeColor=#6366f1;fontColor=#3730a3;fontSize=11;" vertex="1" parent="lane_sources">
+          <mxGeometry x="25" y="260" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="src_opencost" value="&lt;b&gt;OpenCost&lt;/b&gt;&lt;br&gt;FinOps 成本核算账单&lt;br&gt;(Node/Pod/Billing)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#22c55e;fontColor=#166534;fontSize=11;" vertex="1" parent="lane_sources">
+          <mxGeometry x="25" y="360" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="src_docs" value="&lt;b&gt;文档与知识库&lt;/b&gt;&lt;br&gt;Git/Backstage TechDocs&lt;br&gt;(Markdown/PDF/Code)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e8ff;strokeColor=#a855f7;fontColor=#6b21a8;fontSize=11;" vertex="1" parent="lane_sources">
+          <mxGeometry x="25" y="460" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="src_langfuse" value="&lt;b&gt;Langfuse Traces&lt;/b&gt;&lt;br&gt;LLM 调用历史/Prompt&lt;br&gt;(Agent 对话评测记录)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fae8ff;strokeColor=#d946ef;fontColor=#86198f;fontSize=11;" vertex="1" parent="lane_sources">
+          <mxGeometry x="25" y="560" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="src_trigger" value="&lt;b&gt;触发与调度接入&lt;/b&gt;&lt;br&gt;Cron / Tekton Trigger /&lt;br&gt;Kagent Agent 运维事件" style="shape=note;whiteSpace=wrap;html=1;size=14;fillColor=#f8fafc;strokeColor=#64748b;fontColor=#334155;fontSize=10;" vertex="1" parent="lane_sources">
+          <mxGeometry x="25" y="660" width="170" height="80" as="geometry" />
+        </mxCell>
+        <!-- 泳道 2: Kubeflow 数据清洗流水线核心 (KFP DAG) -->
+        <mxCell id="lane_kfp" value="Kubeflow 数据清洗编排核心 (KFP Pipeline DAG &amp; Compute)" style="swimlane;whiteSpace=wrap;html=1;startSize=30;rounded=1;arcSize=8;fillColor=#eff6ff;strokeColor=#3b82f6;fontColor=#1e3a8a;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="80" width="670" height="780" as="geometry" />
+        </mxCell>
+
+        <!-- Step 1: 抽取与 Schema 校验 -->
+        <mxCell id="kfp_step1" value="&lt;b&gt;Step 1: 数据抽取与结构对齐&lt;/b&gt;&lt;br&gt;多源 Connector (PromQL/SQL/S3)&lt;br&gt;Schema 格式检查 (Great Expectations)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3b82f6;strokeWidth=2;fontSize=11;fontColor=#1e40af;" vertex="1" parent="lane_kfp">
+          <mxGeometry x="30" y="55" width="260" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- Step 2: 降噪、脱敏与过滤 -->
+        <mxCell id="kfp_step2" value="&lt;b&gt;Step 2: 降噪、清洗与脱敏过滤&lt;/b&gt;&lt;br&gt;时序异常点截断 (IQR/3-Sigma)&lt;br&gt;日志/文本 PII 隐私脱敏 (Regex/Presidio)&lt;br&gt;无效 Debug/404 错误日志噪音过滤" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3b82f6;strokeWidth=2;fontSize=11;fontColor=#1e40af;" vertex="1" parent="lane_kfp">
+          <mxGeometry x="30" y="160" width="260" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- Step 3: 缺失值填充与特征工程 -->
+        <mxCell id="kfp_step3" value="&lt;b&gt;Step 3: 缺失填充与重采样工程&lt;/b&gt;&lt;br&gt;时序等距重采样 (Resampling / EWMA)&lt;br&gt;表格缺失值线性插值 / 均值填充&lt;br&gt;FinOps 成本多维聚合 (Pod/Namespace)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3b82f6;strokeWidth=2;fontSize=11;fontColor=#1e40af;" vertex="1" parent="lane_kfp">
+          <mxGeometry x="30" y="285" width="260" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- Step 4: 语义去重与分块 -->
+        <mxCell id="kfp_step4" value="&lt;b&gt;Step 4: 语义去重与知识分块 (RAG/NLP)&lt;/b&gt;&lt;br&gt;文本精确去重 &amp; 模糊去重 (MinHash/LSH)&lt;br&gt;Markdown 语义分块 (Recursive Splitter)&lt;br&gt;代码文件元数据标注 (Header Tagging)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3b82f6;strokeWidth=2;fontSize=11;fontColor=#1e40af;" vertex="1" parent="lane_kfp">
+          <mxGeometry x="30" y="410" width="260" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- Step 5: 质量校验与数据剖析 -->
+        <mxCell id="kfp_step5" value="&lt;b&gt;Step 5: 清洗质量评估与产出入库&lt;/b&gt;&lt;br&gt;数据完整率 / 异常率指标校验&lt;br&gt;生成清洗质量报告 (Data Profiling)&lt;br&gt;触发下游写入与版本标记" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3b82f6;strokeWidth=2;fontSize=11;fontColor=#1e40af;" vertex="1" parent="lane_kfp">
+          <mxGeometry x="30" y="535" width="260" height="75" as="geometry" />
+        </mxCell>
+
+        <!-- 右侧子框: 运行时支撑与引擎 -->
+        <mxCell id="kfp_engine_box" value="底层计算与工件支撑组件 (Runtime Support)" style="swimlane;whiteSpace=wrap;html=1;rounded=1;arcSize=6;fillColor=#f8fafc;strokeColor=#64748b;fontColor=#334155;fontSize=11;fontStyle=1;" vertex="1" parent="lane_kfp">
+          <mxGeometry x="340" y="55" width="300" height="555" as="geometry" />
+        </mxCell>
+        <mxCell id="kfp_kfp_ctrl" value="&lt;b&gt;KFP Controller &amp; API Server&lt;/b&gt;&lt;br&gt;流水线编排调度器&lt;br&gt;(DAG 解析 / Pod 状态追踪)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontColor=#1e40af;fontSize=10;" vertex="1" parent="kfp_engine_box">
+          <mxGeometry x="20" y="40" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kfp_engines" value="&lt;b&gt;轻量高性能清洗算子引擎&lt;/b&gt;&lt;br&gt;• &lt;b&gt;Polars / DuckDB&lt;/b&gt; (单节点超低内存开销)&lt;br&gt;• &lt;b&gt;PyArrow&lt;/b&gt; (高速列式内存转换)&lt;br&gt;• &lt;b&gt;Spark/Ray Operator&lt;/b&gt; (大规模扩展)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef08a;strokeColor=#ca8a04;fontColor=#713f12;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="kfp_engine_box">
+          <mxGeometry x="20" y="125" width="260" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="kfp_minio" value="&lt;b&gt;S3 / MinIO 对象存储 (核心工件池)&lt;/b&gt;&lt;br&gt;• 存储 Step 中间数据 (Parquet/JSON)&lt;br&gt;• 跨步骤状态传递与缓存 (Artifacts)&lt;br&gt;• 长期数据集沉淀与版本追踪" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#fed7aa;strokeColor=#f97316;fontColor=#7c2d12;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="kfp_engine_box">
+          <mxGeometry x="20" y="235" width="260" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="kfp_mlmd" value="&lt;b&gt;ML Metadata (MLMD) / 元数据库&lt;/b&gt;&lt;br&gt;记录数据血缘、执行参数、输入输出&lt;br&gt;支持清洗任务追溯与复现" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#475569;fontColor=#1e293b;fontSize=10;" vertex="1" parent="kfp_engine_box">
+          <mxGeometry x="20" y="375" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kfp_notebooks" value="&lt;b&gt;Kubeflow Notebooks (可选)&lt;/b&gt;&lt;br&gt;数据探索 (EDA) 与清洗脚本交互调试" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#475569;fontSize=10;" vertex="1" parent="kfp_engine_box">
+          <mxGeometry x="20" y="460" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- KFP 底部轻量化部署提醒 -->
+        <mxCell id="kfp_note" value="&lt;b&gt;单节点集群建议模式：&lt;/b&gt;采用 &lt;b&gt;KFP-Standalone&lt;/b&gt; 或复用集群已安装的 &lt;b&gt;Tekton Pipelines&lt;/b&gt;，严禁部署 Istio/Dex 等全家桶组件，以避免内存溢出 (OOM)。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef2f2;strokeColor=#b91c1c;fontColor=#991b1b;fontSize=11;align=left;spacingLeft=15;" vertex="1" parent="lane_kfp">
+          <mxGeometry x="30" y="640" width="610" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- 泳道 3: 下游消费与现有系统接入 (Downstream Consumers) -->
+        <mxCell id="lane_consumers" value="现有消费系统 (Downstream Systems)" style="swimlane;whiteSpace=wrap;html=1;startSize=30;rounded=1;arcSize=8;fillColor=#f8fafc;strokeColor=#10b981;fontColor=#065f46;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="80" width="350" height="780" as="geometry" />
+        </mxCell>
+        <mxCell id="dest_rag" value="&lt;b&gt;kagent-rag (向量知识库)&lt;/b&gt;&lt;br&gt;消费清洗后的高质量文档与代码切片&lt;br&gt;写入 Qdrant / Milvus / pgvector" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfdf5;strokeColor=#059669;fontColor=#065f46;fontSize=11;" vertex="1" parent="lane_consumers">
+          <mxGeometry x="25" y="60" width="300" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="dest_predictive" value="&lt;b&gt;Predictive-Ops-Agent (智能体)&lt;/b&gt;&lt;br&gt;消费平滑后的指标与训练特征&lt;br&gt;执行磁盘耗尽 (TTE) 与 OOM 根因外推" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;fontColor=#1e40af;fontSize=11;" vertex="1" parent="lane_consumers">
+          <mxGeometry x="25" y="160" width="300" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="dest_langfuse" value="&lt;b&gt;Langfuse (LLM 观测与评测)&lt;/b&gt;&lt;br&gt;导入过滤清洗后的黄金对话数据集&lt;br&gt;用于 Prompt 回测与模型性能基准" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fae8ff;strokeColor=#c026d3;fontColor=#701a75;fontSize=11;" vertex="1" parent="lane_consumers">
+          <mxGeometry x="25" y="260" width="300" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="dest_pg_finops" value="&lt;b&gt;PostgreSQL &amp; Grafana 报表&lt;/b&gt;&lt;br&gt;写入清洗规整后的 FinOps 聚合成本&lt;br&gt;支持多维度费用大屏展示" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#16a34a;fontColor=#166534;fontSize=11;" vertex="1" parent="lane_consumers">
+          <mxGeometry x="25" y="360" width="300" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="dest_backstage" value="&lt;b&gt;Backstage 开发者门户&lt;/b&gt;&lt;br&gt;统一展示清洗流水线状态与数据 Catalog&lt;br&gt;提供一键触发与血缘查看插件" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#475569;fontColor=#334155;fontSize=11;" vertex="1" parent="lane_consumers">
+          <mxGeometry x="25" y="460" width="300" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="dest_gitops" value="&lt;b&gt;ArgoCD GitOps 纳管&lt;/b&gt;&lt;br&gt;流水线定义代码化 (Pipeline-as-Code)&lt;br&gt;版本变更审计与自动同步" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff1f2;strokeColor=#e11d48;fontColor=#9f1239;fontSize=11;" vertex="1" parent="lane_consumers">
+          <mxGeometry x="25" y="560" width="300" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- 连线: 数据源至 Step 1 -->
+        <mxCell id="edge_src_to_step1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#3b82f6;strokeWidth=2;" edge="1" parent="1" source="src_prom" target="kfp_step1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_src2_to_step1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#3b82f6;strokeWidth=2;" edge="1" parent="1" source="src_loki" target="kfp_step1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_src3_to_step1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#3b82f6;strokeWidth=2;" edge="1" parent="1" source="src_pg" target="kfp_step1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_src4_to_step1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#3b82f6;strokeWidth=2;" edge="1" parent="1" source="src_docs" target="kfp_step1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 连线: KFP DAG 流转 -->
+        <mxCell id="edge_step1_step2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563eb;strokeWidth=2;" edge="1" parent="lane_kfp" source="kfp_step1" target="kfp_step2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_step2_step3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563eb;strokeWidth=2;" edge="1" parent="lane_kfp" source="kfp_step2" target="kfp_step3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_step3_step4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563eb;strokeWidth=2;" edge="1" parent="lane_kfp" source="kfp_step3" target="kfp_step4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_step4_step5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563eb;strokeWidth=2;" edge="1" parent="lane_kfp" source="kfp_step4" target="kfp_step5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 连线: 步骤与 MinIO 读写交互 -->
+        <mxCell id="edge_dag_minio" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#ea580c;strokeWidth=1;" edge="1" parent="lane_kfp" source="kfp_step2" target="kfp_minio">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_dag_minio2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#ea580c;strokeWidth=1;" edge="1" parent="lane_kfp" source="kfp_step4" target="kfp_minio">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 连线: 产出写入下游 -->
+        <mxCell id="edge_out_rag" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#059669;strokeWidth=2;" edge="1" parent="1" source="kfp_step5" target="dest_rag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_out_predictive" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#2563eb;strokeWidth=2;" edge="1" parent="1" source="kfp_step5" target="dest_predictive">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_out_langfuse" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#c026d3;strokeWidth=2;" edge="1" parent="1" source="kfp_step5" target="dest_langfuse">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_out_pg" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#16a34a;strokeWidth=2;" edge="1" parent="1" source="kfp_step5" target="dest_pg_finops">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+
