@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-cleaner-demo
+  namespace: monitoring
+  labels:
+    app: loki-cleaner-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loki-cleaner-demo
+  template:
+    metadata:
+      labels:
+        app: loki-cleaner-demo
+    spec:
+      containers:
+      - name: cleaner
+        image: python:3.11-slim
+        command:
+        - /bin/sh
+        - -c
+        - |
+          pip install --no-cache-dir fastapi uvicorn requests
+          python /app/loki_cleaner_demo.py
+        env:
+        - name: LOKI_ADDR
+          value: "http://loki.monitoring.svc:3100"
+        ports:
+        - containerPort: 8088
+          name: http
+        volumeMounts:
+        - name: code
+          mountPath: /app
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      volumes:
+      - name: code
+        configMap:
+          name: loki-cleaner-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki-cleaner-demo-svc
+  namespace: monitoring
+  labels:
+    app: loki-cleaner-demo
+spec:
+  type: NodePort
+  selector:
+    app: loki-cleaner-demo
+  ports:
+  - port: 8088
+    targetPort: 8088
+    nodePort: 30888
+    name: http
